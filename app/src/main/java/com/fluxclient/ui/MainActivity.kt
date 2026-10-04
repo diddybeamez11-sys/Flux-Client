@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.fluxclient.model.ConnectionDraft
 import com.fluxclient.service.FluxAccountStore
 import com.fluxclient.service.RelayController
+import net.raphimc.minecraftauth.step.msa.StepMsaDeviceCode
 import com.fluxclient.ui.theme.FluxTheme
 import kotlin.concurrent.thread
 
@@ -53,12 +54,12 @@ class MainActivity : ComponentActivity() {
                     loginMessage = "Opening Microsoft device login..."
                     thread(name = "FluxLogin") {
                         runCatching {
-                            FluxAccountStore.login(this@MainActivity) { device ->
+                            FluxAccountStore.login(this@MainActivity, StepMsaDeviceCode.MsaDeviceCodeCallback { device ->
                                 runOnUiThread {
                                     loginMessage = "Enter the displayed Microsoft code in your browser"
                                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(device.directVerificationUri)))
                                 }
-                            }
+                            })
                         }.onSuccess { session ->
                             runOnUiThread {
                                 account = session
