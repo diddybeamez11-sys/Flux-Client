@@ -16,7 +16,7 @@
         tools:ignore="QueryAllPackagesPermission" />
 
     <application
-        android:name=".application.AppContext"
+        android:name=".app.FluxApplication"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -30,7 +30,7 @@
         tools:targetApi="tiramisu">
 
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:screenOrientation="landscape"
             android:configChanges="orientation|keyboardHidden|screenSize">
@@ -44,10 +44,8 @@
 
         </activity>
 
-        <activity android:name=".activity.CrashHandlerActivity" />
-
         <service
-            android:name=".service.RelayService"
+            android:name=".service.FluxRelayService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="specialUse"
