@@ -8,9 +8,11 @@ import java.io.File
 /** Keeps the device-code session inside app-private storage. */
 object FluxAccountStore {
     private const val FILE = "flux-bedrock-session.json"
-    fun load(context: Context): StepFullBedrockSession.FullBedrockSession? = runCatching {
-        authorize(cache = true, file = File(context.filesDir, FILE), msaDeviceCodeCallback = {})
-    }.getOrNull()
+    fun load(context: Context): StepFullBedrockSession.FullBedrockSession? {
+        val file = File(context.filesDir, FILE)
+        if (!file.exists()) return null
+        return runCatching { authorize(cache = true, file = file, msaDeviceCodeCallback = {}) }.getOrNull()
+    }
 
     fun login(context: Context, callback: net.raphimc.minecraftauth.step.msa.StepMsaDeviceCode.MsaDeviceCodeCallback): StepFullBedrockSession.FullBedrockSession =
         authorize(cache = true, file = File(context.filesDir, FILE), msaDeviceCodeCallback = callback)
