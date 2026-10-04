@@ -28,7 +28,7 @@ before promotion.
 Minecraft (local Bedrock client)
         | UDP/RakNet :19132
         v
-Flux WRelay -> codec/version negotiation -> packet listeners -> remote server
+Flux relay -> codec/version negotiation -> packet listeners -> remote server
                                       |
                                       +-- modules (combat, motion, visual, world, misc)
                                       +-- Compose configuration + floating overlay
