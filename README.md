@@ -22,6 +22,14 @@ The app also uses the Android system debug/release signing flow, avoids legacy
 shared-storage permissions, and creates the foreground notification channel
 before promotion.
 
+## Flux core rewrite
+
+The new `com.fluxclient.core` package is the foundation of the rewrite. It contains an
+Android-independent relay lifecycle, immutable relay configuration, and a deterministic
+packet middleware pipeline with size limits, direction metadata, sequence numbers,
+copy-on-ingress semantics, and drop/forward decisions. Transport integration is kept
+out of this core so it can be tested without opening sockets.
+
 ## Architecture
 
 ```
