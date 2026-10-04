@@ -29,14 +29,14 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Set up Android SDK command-line tools
-        uses: android-actions/setup-android@v3
-
       - name: Install Android SDK packages
         shell: bash
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platform-tools" "build-tools;36.0.0" "platforms;android-36"
+          sdk_root="${ANDROID_SDK_ROOT:-${ANDROID_HOME}}"
+          sdkmanager_bin="$(find "$sdk_root/cmdline-tools" -type f -name sdkmanager | head -n 1)"
+          test -x "$sdkmanager_bin"
+          yes | "$sdkmanager_bin" --licenses >/dev/null || true
+          "$sdkmanager_bin" "platform-tools" "build-tools;36.0.0" "platforms;android-36"
 
       - name: Make Gradle executable
         run: chmod +x ./gradlew
