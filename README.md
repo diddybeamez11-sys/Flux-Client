@@ -10,12 +10,12 @@ Minecraft memory or inject native code into the game.
 - **ProtoHax** has a small, understandable relay/UI split and a useful overlay
   lifecycle, but its native Netty channel and account/service code are tightly
   coupled to the app and its protocol support is dated.
-- **WClient** has the stronger foundation: Cloudburst Bedrock codecs, RakNet
+- the second source has the stronger foundation: Cloudburst Bedrock codecs, RakNet
   transport, version-aware mappings, packet listeners, a module registry, and a
   Compose control surface. Its legacy snapshot also had an unsafe hard-coded
   signing key, broad storage permissions, and service startup ordering issues.
 
-Flux keeps WClient's protocol stack while treating the relay as a boundary:
+Flux provides an independent relay implementation informed by the supplied projects while treating the relay as a boundary:
 packet listeners are isolated from UI state, mappings are selected after
 `StartGamePacket`, and unknown packets are forwarded without losing payloads.
 The app also uses the Android system debug/release signing flow, avoids legacy

@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.retrivedmods.wclient"
+    namespace = "com.fluxclient"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.retrivedmods.wclient"
+        applicationId = "com.fluxclient"
         minSdk = 28
         //noinspection OldTargetApi,EditedTargetSdkVersion
         targetSdk = 35
