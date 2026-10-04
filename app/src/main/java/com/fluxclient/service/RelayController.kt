@@ -8,7 +8,9 @@ import com.fluxclient.relay.FluxRelay
 import com.fluxclient.relay.address.FluxAddress
 import com.fluxclient.relay.listener.AutoCodecPacketListener
 import com.fluxclient.relay.listener.GamingPacketHandler
+import com.fluxclient.relay.listener.OnlineLoginPacketListener
 import com.fluxclient.relay.util.captureGamePacket
+import net.raphimc.minecraftauth.step.bedrock.session.StepFullBedrockSession
 import kotlin.concurrent.thread
 
 /** Owns the real RakNet/Bedrock relay. UI only submits validated connection settings. */
@@ -25,7 +27,7 @@ object RelayController {
     fun initialize(context: Context) { appContext = context.applicationContext }
 
     @Synchronized
-    fun start(host: String, port: Int): Boolean {
+    fun start(host: String, port: Int, account: StepFullBedrockSession.FullBedrockSession? = null): Boolean {
         if (running || worker != null) return true
         error = null
         worker = thread(name = "FluxRelay", start = true) {
@@ -36,6 +38,7 @@ object RelayController {
                     remoteAddress = remote
                 ) {
                     listeners.add(AutoCodecPacketListener(this))
+                    account?.let { listeners.add(OnlineLoginPacketListener(this, it)) }
                     listeners.add(GamingPacketHandler(this))
                 }
                 running = true
