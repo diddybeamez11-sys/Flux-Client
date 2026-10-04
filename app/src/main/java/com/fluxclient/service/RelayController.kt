@@ -4,13 +4,18 @@ import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.fluxclient.core.FluxRelayEngine
-import com.fluxclient.core.RelayConfig
+import com.fluxclient.relay.FluxRelay
+import com.fluxclient.relay.address.FluxAddress
+import com.fluxclient.relay.listener.AutoCodecPacketListener
+import com.fluxclient.relay.listener.GamingPacketHandler
+import com.fluxclient.relay.util.captureGamePacket
+import kotlin.concurrent.thread
 
-/** Single owner of relay lifecycle; activities never own sockets or threads. */
+/** Owns the real RakNet/Bedrock relay. UI only submits validated connection settings. */
 object RelayController {
     private var appContext: Context? = null
-    private var engine: FluxRelayEngine? = null
+    private var relay: FluxRelay? = null
+    private var worker: Thread? = null
 
     var running by mutableStateOf(false)
         private set
@@ -21,27 +26,34 @@ object RelayController {
 
     @Synchronized
     fun start(host: String, port: Int): Boolean {
-        if (running) return true
-        return runCatching {
-            val created = FluxRelayEngine(
-                RelayConfig(remoteHost = host, remotePort = port)
-            )
-            created.start()
-            engine = created
-            error = null
-            running = true
-            true
-        }.getOrElse {
-            error = it.message ?: "Unable to start Flux relay"
-            false
+        if (running || worker != null) return true
+        error = null
+        worker = thread(name = "FluxRelay", start = true) {
+            runCatching {
+                val remote = FluxAddress(host.trim(), port)
+                relay = captureGamePacket(
+                    localAddress = FluxAddress("0.0.0.0", 19132),
+                    remoteAddress = remote
+                ) {
+                    listeners.add(AutoCodecPacketListener(this))
+                    listeners.add(GamingPacketHandler(this))
+                }
+                running = true
+            }.onFailure {
+                error = it.message ?: "Unable to start Flux relay"
+                running = false
+            }
         }
+        return true
     }
 
     @Synchronized
     fun stop() {
-        engine?.close()
-        engine = null
+        relay?.stop()
+        relay = null
         running = false
+        worker?.interrupt()
+        worker = null
     }
 
     fun shutdown() = stop()
